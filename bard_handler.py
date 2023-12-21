@@ -52,55 +52,22 @@ def get_full_user_details(messages):
     """
 
     chatHistory.append({"role": "user", "parts": [initPrompt]})
-
-    # chat = model.start_chat(history=history)
-
-    # response = chat.send_message(initPrompt)
-    # print(f"Gemini : {response.text}")
-    while True:
-        response = model.generate_content(chatHistory,
-                                          generation_config={"temperature": 0.9, "top_p": 1,
-                                              "stop_sequences": ["X"]},
-                                          safety_settings=[
-                                              {
-                                                  "category": "HARM_CATEGORY_HARASSMENT",
-                                                  "threshold": "BLOCK_NONE",
-                                              },
-                                              {
-                                                  "category": "HARM_CATEGORY_HATE_SPEECH",
-                                                  "threshold": "BLOCK_NONE"
-                                              }
-                                          ]
-                                          )
-        if "Received hihihiha" in response.text:
-            messages = chatHistory
-            print("Writing json")
-            # f = open("gemini.json", "w")
-            # a = response.text.split("\n")
-            # a.pop(0)
-            # f.write(response.text)
-            # # for i in range(len(a)):
-            # #     f.write(str(a[i]))
-            # # f.close()
-            # return messages
-            return response.text #returning here
-
-        print(f"respone feedback : {response.prompt_feedback}")
-        print(f"Gemini: {response.text}")
-
-        #     ans = model.generate_content("give me the json you've created as per my requirements")
-        #     f = open("req.json" ,"w")
-        #     f.write(ans.text)
-        #     print("DONE!")
-        #     exit(0)
-        # else:
-
-        chatHistory.append({"role": "model", "parts": [response.text]})
-        message = input("You : ")
-        if (len(message.strip()) < 1):
-            print("You haven't entered anything!")
-            continue
-        chatHistory.append({"role": "user", "parts": [message]})
+    chatHistory.append(messages)
+    response = model.generate_content(chatHistory,
+                                      generation_config={"temperature": 0.9, "top_p": 1,
+                                          "stop_sequences": ["X"]},
+                                      safety_settings=[
+                                          {
+                                              "category": "HARM_CATEGORY_HARASSMENT",
+                                              "threshold": "BLOCK_NONE",
+                                          },
+                                          {
+                                              "category": "HARM_CATEGORY_HATE_SPEECH",
+                                              "threshold": "BLOCK_NONE"
+                                          }
+                                      ]
+                                      )
+    return response.text
 
 
 def short_list_hotels(messages, hotels):
@@ -108,7 +75,6 @@ def short_list_hotels(messages, hotels):
     messages.append({"role": "user", "parts": [initPrompt]})
 
     while True:
-
         response = model.generate_content(messages,generation_config={"temperature": 0.9, "top_p": 1,
                                                   "stop_sequences": ["X"]},
                                               safety_settings=[

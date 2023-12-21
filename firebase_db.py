@@ -14,9 +14,7 @@ users_ref = db.collection("users")
 def create_user_session(userId, msg):
     (users_ref.document(userId).collection(current_milli_time())
      .document("1").set(msg))
-    pass
 
 
 def add_message_to_user_session(userId, sessionId, msg):
     users_ref.document(userId).collection(sessionId).document(current_milli_time()).set(msg)
-    pass
