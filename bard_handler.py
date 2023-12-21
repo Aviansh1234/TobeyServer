@@ -7,6 +7,7 @@ genai.configure(api_key=api_key)
 
 model = genai.GenerativeModel("gemini-pro")
 
+
 def get_full_user_details(messages):
     chatHistory = []
     initPrompt = """
@@ -55,7 +56,7 @@ def get_full_user_details(messages):
     chatHistory.extend(messages)
     response = model.generate_content(chatHistory,
                                       generation_config={"temperature": 0.9, "top_p": 1,
-                                          "stop_sequences": ["X"]},
+                                                         "stop_sequences": ["X"]},
                                       safety_settings=[
                                           {
                                               "category": "HARM_CATEGORY_HARASSMENT",
@@ -75,18 +76,18 @@ def short_list_hotels(messages, hotels):
     initPrompt = f""" Now, based on the conversation above, suggest which hotels the user would like from the given list : {str(hotels)}.You'll not ask for any more information, you'll only output a python string list containign the names of the hotels which you think will be preferred by the user,based on the previous conversation, among the list of hotels given to you. """
     messages.append({"role": "user", "parts": [initPrompt]})
 
-    response = model.generate_content(messages,generation_config={"temperature": 0.9, "top_p": 1,
-                                              "stop_sequences": ["X"]},
-                                          safety_settings=[
-                                              {
-                                                  "category": "HARM_CATEGORY_HARASSMENT",
-                                                  "threshold": "BLOCK_NONE",
-                                              },
-                                              {
-                                                  "category": "HARM_CATEGORY_HATE_SPEECH",
-                                                  "threshold": "BLOCK_NONE"
-                                              }
-                                          ])
+    response = model.generate_content(messages, generation_config={"temperature": 0.9, "top_p": 1,
+                                                                   "stop_sequences": ["X"]},
+                                      safety_settings=[
+                                          {
+                                              "category": "HARM_CATEGORY_HARASSMENT",
+                                              "threshold": "BLOCK_NONE",
+                                          },
+                                          {
+                                              "category": "HARM_CATEGORY_HATE_SPEECH",
+                                              "threshold": "BLOCK_NONE"
+                                          }
+                                      ])
     return response.text
     # print(f"respone feedback : {response.prompt_feedback}")
     # print(f"Gemini: {response.text}")
@@ -97,9 +98,9 @@ def short_list_hotels(messages, hotels):
     #     continue
     # messages.append({"role": "user", "parts": [message]})
 
+
 def show_hotels_creatively(hotels):
     pass
-
 
 
 def main():
@@ -111,17 +112,22 @@ def main():
         print(dictString)
         message = input("You: ")
         messages.append({"role": "user", "parts": [message]})
-        if("Received hihihiha" in dictString):
+        if ("Received hihihiha" in dictString):
             print("breaking")
             break
 
-    if (dictString != "") :
+    if (dictString != ""):
         print(dictString)
+        print("messages : //////////////////////////////////////////////////////////////")
+        print(messages)
+        print("////////////////////////////////////////")
         dictString = dictString.replace("Received hihihiha", "")
+        dictString = dictString.replace("null", "")
         dictString.strip()
         print(dictString)
         userData = eval(dictString)
         print(userData)
         short_list_hotels(messages, hotels)
+
 
 main()
