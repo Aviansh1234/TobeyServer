@@ -1,5 +1,6 @@
 import re
 import json
+import tbo_handler as tbo
 
 def convert_string_to_json(input):
     match = re.search(r'\{')
@@ -21,13 +22,6 @@ def make_json_searchable(input_json):
                 1,
                 16
             ]
-        },
-        {
-            "Adults": 1,
-            "Children": 0,
-            "ChildrenAges": [
-                1
-            ]
         }
     ],
     "IsDetailResponse": True,
@@ -39,5 +33,21 @@ def make_json_searchable(input_json):
     }
 }
     for key,value in input_json.items():
+        if key == "CityName":
+            continue
+        if key == "CountryName":
+            currcode = tbo.get_city_code(input_json["CountryName"], input_json["CityName"])
+            if currcode == "City Not Found" or currcode == '-1':
+                currcode = example_json["CityCode"]
+            example_json["CityCode"] = currcode
+            continue
         example_json[key] = value
     return example_json
+def convert_firebase_msg_to_bard(messages):
+    ans = []
+    for msg in messages:
+        curr = {}
+        curr["role"] = msg["author"]
+        curr["parts"] = [msg["messageContent"]]
+        ans.append(curr)
+    return ans
