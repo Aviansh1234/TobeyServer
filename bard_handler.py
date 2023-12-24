@@ -34,14 +34,14 @@ def get_full_user_details(messages):
         }
     }
     Your top priority is to fill the json file with the data you'll ask from the user and output it as soon as you're done. You'll only ask one question as a time, like in standard conversations with a travel agent and make the user feel at home. You'll not ask for data in any specific format, but will take whatever data the user gives you and parse it accordingly, i.e. you'l never say the word format.
-    You will respond only with questions and nothing else. You will not ask anything which is not required to fill in the json and ask only relevant questions required to fill the json file first and when you're done, you'll output the json. After that, you'll keep asking for more preferences from the user. First, you'll greet the user by introducing yourself as the AI assistant for TBO.com and ask for the destination city in the same message.You'llbe extremely friendly and will make the conversation very engaging while not pushing the user for any info or being repetitive.
+    You will respond only with questions and nothing else. You will not ask anything which is not required to fill in the json and ask only relevant questions required to fill the json file first and when you're done, you'll output the json. After that, you'll ask once for more preferences from the user. First, you'll greet the user by introducing yourself as the AI assistant for TBO.com and ask for the destination city in the same message.You'llbe extremely friendly and will make the conversation very engaging while not pushing the user for any info or being repetitive. You'll see your response for any dump values first and not try to fill in any random words.
     You will follow the order of questions : 
     1. Their destination city. You'll get the country name based on the destination city, and will fill in the country code, example IN for India, US for United States, etc. In case there are two cities of the same name in different countries, you'll ask the user to clarify, but only when necessary. Do not forget to fill the CountryName field under any circumstances.
     2. Their check-in and check-out dates
     3. Number of travellers and required number of rooms
     4. Composition of travellers(as children and adults)
     5. ages of children (if any). You'll ask for their ages and check if they're below 18. If not, you'll prompt the user and ask for the details again. You'll fill in these ages in the corresponding list in paxrooms field.
-    6. composition of the rooms (how many adults and how many children in a specific room)
+    6. composition of the rooms (how many adults and how many children in a specific room). You will not forget to ask for this, this is essential.
     7. their nationality and preferred currency of payment
     8. The preferred meal plan with their hotel booking.
     9. Their preference on refundability.
@@ -72,7 +72,6 @@ def get_full_user_details(messages):
 
     return response.text
 
-#Now, based on the conversation above, suggest which hotels the user would like from the given list : {str(hotels)}.You'll not ask for any more information, you'll only output a python string list containign the names of the hotels which you think will be preferred by the user,based on the previous conversation, among the list of hotels given to you.
 def short_list_hotels(messages, hotels):
     messages.insert(0, {"role": "user", "parts": ["hello"]})
     chatHistory = []
@@ -92,9 +91,10 @@ def short_list_hotels(messages, hotels):
                                           }
                                       ]
                                       )
-
-
-    return response.text
+    req = response.text.replace("`", "")
+    req = req.replace("python", "")
+    reqHotels = eval(req)
+    return reqHotels
 
 def show_hotels_creatively(messages, hotels):
     chatHistory = []
@@ -116,4 +116,6 @@ def show_hotels_creatively(messages, hotels):
                                       ]
                                       )
 
+
     return response.text
+
