@@ -3,7 +3,7 @@ import json
 import tbo_handler as tbo
 
 def convert_string_to_json(input):
-    match = re.search(r'\{')
+    match = re.search(r'\{', input)
     input = input[match.start():]
     return json.loads(input)
 def make_json_searchable(input_json):
@@ -33,10 +33,12 @@ def make_json_searchable(input_json):
     }
 }
     for key,value in input_json.items():
-        if key == "CityName":
+        if value == '-1':
+            continue;
+        if key == "City":
             continue
         if key == "CountryName":
-            currcode = tbo.get_city_code(input_json["CountryName"], input_json["CityName"])
+            currcode = tbo.get_city_code(input_json["CountryName"], input_json["City"])
             if currcode == "City Not Found" or currcode == '-1':
                 currcode = example_json["CityCode"]
             example_json["CityCode"] = currcode

@@ -3,13 +3,16 @@ from firebase_admin import credentials, firestore
 import time
 import config
 
+
 def current_milli_time():
     return str(round(time.time() * 1000))
+
 
 cred = credentials.Certificate(config.firebase_key_path)
 app = firebase_admin.initialize_app(cred)
 db = firestore.client()
 users_ref = db.collection("users")
+
 
 def create_user_session(userId, msg):
     id = current_milli_time()
@@ -17,8 +20,10 @@ def create_user_session(userId, msg):
      .document("1").set({"messageContent": msg, "author": "model", "itenaryId": ""}))
     return id
 
+
 def add_message_to_user_session(userId, sessionId, msg):
     users_ref.document(userId).collection(sessionId).document(current_milli_time()).set(msg)
+
 
 def get_user_session(userId, sessionId):
     docs = users_ref.document(userId).collection(sessionId).stream()
@@ -26,3 +31,14 @@ def get_user_session(userId, sessionId):
     for doc in docs:
         arr.append(doc.to_dict())
     return arr
+
+
+def make_user_session_complete(userId, sessionId):
+    users_ref.document(userId).collection(sessionId).document('1').update({"complete": True})
+
+
+def add_hotels_to_user_session(userId, sessionId, hotels):
+    i = 1
+    for hotel in hotels:
+        users_ref.document(userId).collection(sessionId+" : hotels").document(str(i)).set(hotel)
+        i += 1

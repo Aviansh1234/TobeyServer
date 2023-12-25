@@ -5,13 +5,17 @@ import config
 
 creds = HTTPBasicAuth(config.user_name, config.password)
 
+
 def search_hotels(query):
     response = requests.post(config.tbo_base_url + "/HotelSearch", auth=creds, json=query)
+    if response.json()['Status']['Code'] == 201:
+        return []
     if response.status_code == 200:
         return response.json()['HotelSearchResults']
     else:
         return None
     pass
+
 
 def get_hotel_info(hotel_id):
     response = requests.post(config.tbo_base_url + "/Hoteldetails", auth=creds,
@@ -21,6 +25,8 @@ def get_hotel_info(hotel_id):
     else:
         return None
     pass
+
+
 def get_city_code(country_code, city_name):
     response = requests.post(config.tbo_base_url + "/CityList", auth=creds, json={'CountryCode': country_code})
     if response.status_code == 200:
