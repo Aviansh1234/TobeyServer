@@ -45,8 +45,10 @@ def get_full_user_details(messages):
     7. their nationality and preferred currency of payment. The nationality must also be written in the form of country code, for exaxmple, IN for India, US for United States, UAE for Dubai and so on.
     8. The preferred meal plan with their hotel booking. This information is also necessary, don't forget to ask for this.
     9. Their preference on refundability. This information is also necessary, don't forget to ask for this.
-    You'll ask all the questions in a very friendly, playful manner and will not keep pushing for the answer, and will not the details of the json to the user. You'll act calm and confident and not bug the user for answers. There should not be more than 3 sentences in one message.
-    In case the user forgets to answer a question you've asked, ask the question again. If the user isn't sure of the answer, don't put any pressure and populate that field with -1 in the json.
+    10. Any additional preferences they want. There's no field in json for this so you'll just ask for this and get their response.
+    11. A confirmation of all the given details. If the user confirms, output the json and write nothing else in that message, except the "Received hihihiha" and the json.
+    You'll ask all the questions in a very friendly, playful manner and will not keep pushing for the answer, and will not discuss the details of the json with user. You'll act calm and confident and not bug the user for answers. There should not be more than 3 sentences in one message.
+    In case the user forgets to answer a question you've asked, ask the question again. If the user isn't sure of the answer, don't put any pressure and populate that field with -1 in the json. You'll confirm the response in a seperate message and not ask anything else in the same message. Use seperate messages for each question. You will not confirm the validity of a response and ask the next question in the same message under any circumstances.
     You will not output the json unless you've confirmed the validity of all the data from the user.
      You'll ensure that all the details have been asked for from your side, and will stick to the ordering given. Under no circumstances will you break the ordering given, or ask more than one question in one message. Also, in the end, you won't say anything about looking for hotels, but will just output the json with 'Received hihihiha' on the top. Even if the user redirects you to a different conversation, you'll direct back into relevant questions and direct it back, and will output the json in the end with 'Received hihihiha'.
 
@@ -102,7 +104,7 @@ def show_hotels_creatively(messages, hotels):
     reviews = []
     for hotel in hotels:
 
-        initPrompt =f""" Now, based on the conversation above, this is a hotel which has been shortlisted : {str(hotel)}. Now, I need you to give me pros and cons of this hotel and present it very creatively, in natural language, not in any format, while carefully assessing the user's needs and what features of the hotel align with them, and what don't.Your review will be personalised for the user, and should address the needs of the user, and will write the review in a tone of talking to the user as a friend.  You'll ensure that all reviews are under 100 words, and are fun to read."""
+        initPrompt =f""" Now, based on the conversation above, this is a hotel which has been shortlisted : {str(hotel)}. Now, I need you to give me pros and cons of this hotel and present it very creatively, in natural language, not in any format, while carefully assessing the user's needs and what features of the hotel align with them, and what don't.Your review will be personalised for the user, and should address the needs of the user, and will write the review in a tone of talking to the user as a friend. You can be harsh in pointing out the shortcomings of the hotel where it doesn't meets the user's expectations. You'll ensure that all reviews are under 100 words, and are fun to read."""
         chatHistory.extend(messages)
         chatHistory.append({"role": "user", "parts": [initPrompt]})
         response = model.generate_content(chatHistory,
@@ -126,22 +128,22 @@ def show_hotels_creatively(messages, hotels):
     return reviews
 
 
-# def main():
-#     messages = []
-#     hotels = ["Alila Diwa, Goa", "Grand Hyatt, Goa", "Caravela Beach Resort, Goa", "The Lalit Golf and Spa Resort, Goa", "Taj Holiday Village Resort and Spa", "Holiday Inn resort, Goa"]
-#     while True:
-#         response = get_full_user_details(messages)
-#         messages.append({"role": "model", "parts": [response]})
-#         if "PaxRooms" in response:
-#             break
-#         print(response)
-#         query = input("You: ")
-#         if query == "":
-#             print("Not a valid entry. Try again.")
-#             continue
-#         messages.append({"role": "user", "parts": [query]})
-#     short_listed_hotels = short_list_hotels(messages, hotels)
-#     print(short_listed_hotels)
-#     reviews = show_hotels_creatively(messages, short_listed_hotels)
-#     print(reviews)
-# main()
+def main():
+    messages = []
+    hotels = ["Alila Diwa, Goa", "Grand Hyatt, Goa", "Caravela Beach Resort, Goa", "The Lalit Golf and Spa Resort, Goa", "Taj Holiday Village Resort and Spa", "Holiday Inn resort, Goa"]
+    while True:
+        response = get_full_user_details(messages)
+        messages.append({"role": "model", "parts": [response]})
+        if "PaxRooms" in response:
+            break
+        print(response)
+        query = input("You: ")
+        if query == "":
+            print("Not a valid entry. Try again.")
+
+        messages.append({"role": "user", "parts": [query]})
+    short_listed_hotels = short_list_hotels(messages, hotels)
+    print(short_listed_hotels)
+    reviews = show_hotels_creatively(messages, short_listed_hotels)
+    print(reviews)
+main()
