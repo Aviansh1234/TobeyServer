@@ -128,22 +128,22 @@ def show_hotels_creatively(messages, hotels):
     return reviews
 
 
-def main():
-    messages = []
-    hotels = ["Alila Diwa, Goa", "Grand Hyatt, Goa", "Caravela Beach Resort, Goa", "The Lalit Golf and Spa Resort, Goa", "Taj Holiday Village Resort and Spa", "Holiday Inn resort, Goa"]
-    while True:
-        response = get_full_user_details(messages)
-        messages.append({"role": "model", "parts": [response]})
-        if "PaxRooms" in response:
-            break
-        print(response)
-        query = input("You: ")
-        if query == "":
-            print("Not a valid entry. Try again.")
-
-        messages.append({"role": "user", "parts": [query]})
-    short_listed_hotels = short_list_hotels(messages, hotels)
-    print(short_listed_hotels)
-    reviews = show_hotels_creatively(messages, short_listed_hotels)
-    print(reviews)
-main()
+# def main():
+#     messages = []
+#     hotels = ["Alila Diwa, Goa", "Grand Hyatt, Goa", "Caravela Beach Resort, Goa", "The Lalit Golf and Spa Resort, Goa", "Taj Holiday Village Resort and Spa", "Holiday Inn resort, Goa"]
+#     while True:
+#         response = get_full_user_details(messages)
+#         messages.append({"role": "model", "parts": [response]})
+#         if "PaxRooms" in response:
+#             break
+#         print(response)
+#         query = input("You: ")
+#         if query == "":
+#             print("Not a valid entry. Try again.")
+#
+#         messages.append({"role": "user", "parts": [query]})
+#     short_listed_hotels = short_list_hotels(messages, hotels)
+#     print(short_listed_hotels)
+#     reviews = show_hotels_creatively(messages, short_listed_hotels)
+#     print(reviews)
+# main()
