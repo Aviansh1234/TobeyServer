@@ -105,7 +105,6 @@ def show_hotels_creatively(messages, hotels):
     chatHistory = []
     reviews = []
     for hotel in hotels:
-        print(hotel)
         initPrompt = f""" Now, based on the conversation above, this is a hotel which has been shortlisted : {str(hotel)}. Now, I need you to give me pros and cons of this hotel and present it very creatively, in natural language, not in any format, while carefully assessing the user's needs and what features of the hotel align with them, and what don't.Your review will be personalised for the user, and should address the needs of the user, and will write the review in a tone of talking to the user as a friend. You can be harsh in pointing out the shortcomings of the hotel where it doesn't meets the user's expectations. You'll ensure that all reviews are under 100 words, and are fun to read."""
         chatHistory.extend(messages)
         chatHistory.append({"role": "user", "parts": [initPrompt]})
@@ -126,7 +125,6 @@ def show_hotels_creatively(messages, hotels):
 
                                           )
         chatHistory.remove({"role": "user", "parts": [initPrompt]})
-        # print(response.text)
         reviews.append(response.text)
     return reviews
 
