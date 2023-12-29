@@ -37,21 +37,22 @@ async def updateForNext(sessionId: str, userId: str):
                 hotel_names = []
                 for hotel in hotels:
                     hotel_names.append(hotel["HotelInfo"]["HotelName"])
-                hotel_names = bard_handler.short_list_hotels(messages, hotel_names)
+                hotel_names = bard_handler.short_list_hotels(messages[0:-1], hotel_names)
                 final_hotel_list = []
                 final_hotel_name_list = []
                 for hotel in hotels:
                     if hotel["HotelInfo"]["HotelName"] in hotel_names:
                         final_hotel_list.append(hotel)
                         final_hotel_name_list.append(hotel["HotelInfo"]["HotelName"])
-                creative_result = bard_handler.show_hotels_creatively(messages, final_hotel_name_list)
+                creative_result = bard_handler.show_hotels_creatively(messages[0:-1], final_hotel_name_list)
                 i = 0
                 hotels = []
                 for creative in creative_result:
-                    msg = {"messageContent": final_hotel_name_list[i] + " : " + final_hotel_list[i]["MinHotelPrice"]
-                    ["Currency"] + final_hotel_list[i]["MinHotelPrice"]["TotalPrice"] + "\n" + creative,
+                    msg = {"messageContent": final_hotel_name_list[i] + " : " + str(final_hotel_list[i]["MinHotelPrice"]
+                                                                                    ["Currency"]) + str(
+                        final_hotel_list[i]["MinHotelPrice"]["TotalPrice"]) + "\n" + creative,
                            "author": "model",
-                           "itenaryId": final_hotel_list[i]["HotelInfo"]["HotelCode"]}
+                           "itenaryId": str(final_hotel_list[i]["HotelInfo"]["HotelCode"])}
                     hotels.append(msg)
                     i += 1
                 i = 0
