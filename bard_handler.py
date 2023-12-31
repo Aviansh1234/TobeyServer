@@ -162,7 +162,9 @@ def show_hotels_creatively_one_liner_edition(messages, hotels, reqFunction, args
     chatHistory.remove({"role": "user", "parts": [initPrompt]})
     # print(response.text)
     reviews = response.text.split("\n")
-    reviews.remove("")
+    for review in reviews:
+        if(review == ""):
+            reviews.remove(review)
 
 
     return reviews
