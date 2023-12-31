@@ -129,7 +129,7 @@ def show_hotels_creatively(messages, hotels, reqFunction, hotelInfo): #idk about
                                           )
         chatHistory.remove({"role": "user", "parts": [initPrompt]})
         reviews.append(response.text)
-        if(len(reviews) == 5):
+        if(len(reviews) == 5 or end == len(reviews) - 1):
             hotelsArg = hotels[start:end]
             reqFunction(hotelsArg, hotelInfo)
             reviews = []
@@ -162,6 +162,7 @@ def show_hotels_creatively_one_liner_edition(messages, hotels, reqFunction, args
     chatHistory.remove({"role": "user", "parts": [initPrompt]})
     # print(response.text)
     reviews = response.text.split("\n")
+    reviews.remove("")
 
 
     return reviews
@@ -211,6 +212,6 @@ def show_hotels_creatively_one_liner_edition(messages, hotels, reqFunction, args
 #     print(short_listed_hotels)
 #     reviews = show_hotels_creatively(messages, short_listed_hotels, reqFunction=0, hotelInfo=0)
 #     print(reviews)
-#     short_reviews = show_hotels_creatively_one_liner_edition(messages, hotels, reqFunction=0, args=0)
+#     short_reviews = show_hotels_creatively_one_liner_edition(messages, short_listed_hotels, reqFunction=0, args=0)
 #     print(short_reviews)
 # main()
