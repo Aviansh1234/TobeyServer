@@ -1,5 +1,3 @@
-import json
-
 import google.generativeai as genai
 from config import api_key
 
@@ -75,6 +73,7 @@ def get_full_user_details(messages):
                                       )
     return response.text
 
+
 def short_list_hotels(messages, hotels):
     messages.insert(0, {"role": "user", "parts": ["hello"]})
     chatHistory = []
@@ -82,7 +81,8 @@ def short_list_hotels(messages, hotels):
     chatHistory.extend(messages)
     chatHistory.append({"role": "user", "parts": [initPrompt]})
     response = model.generate_content(chatHistory,
-                                      generation_config=genai.types.GenerationConfig(max_output_tokens=8192,stop_sequences=['X'], top_p=0.9,
+                                      generation_config=genai.types.GenerationConfig(max_output_tokens=8192,
+                                                                                     stop_sequences=['X'], top_p=0.9,
                                                                                      temperature=0.9),
                                       safety_settings=[
                                           {
@@ -100,12 +100,14 @@ def short_list_hotels(messages, hotels):
     reqHotels = eval(req)
     return reqHotels
 
-def show_hotels_creatively(messages, hotels, reqFunction, hotelInfo): #idk about hotel info, so take a look at this, if this is what's required...
-    # messages.insert(0, {"role": "user", "parts": ["hello"]})
+
+def show_hotels_creatively(messages, hotels, reqFunction, final_hotel_list, userId, sessionId):
+    messages.insert(0, {"role": "user", "parts": ["hello"]})
     chatHistory = []
     reviews = []
     start = 0
     end = 0
+    i = 0
     for hotel in hotels:
         end += 1
         initPrompt = f""" Now, based on the conversation above, this is a hotel which has been shortlisted : {str(hotel)}. Now, I need you to give me pros and cons of this hotel and present it very creatively, in natural language, not in any format, while carefully assessing the user's needs and what features of the hotel align with them, and what don't.Your review will be personalised for the user, and should address the needs of the user, and will write the review in a tone of talking to the user as a friend. You can be harsh in pointing out the shortcomings of the hotel where it doesn't meets the user's expectations. You'll ensure that all reviews are under 100 words, and are fun to read."""
@@ -129,19 +131,27 @@ def show_hotels_creatively(messages, hotels, reqFunction, hotelInfo): #idk about
                                           )
         chatHistory.remove({"role": "user", "parts": [initPrompt]})
         reviews.append(response.text)
-        if(len(reviews) == 5 or end == len(reviews) - 1):
-            hotelsArg = hotels[start:end]
-            reqFunction(hotelsArg, hotelInfo)
+        if (len(reviews) == 5 or end == len(hotels) - 1):
+            customMessages = []
+            for review in reviews:
+                print(review.encode("utf-8"))
+                msg = {"messageContent": hotels[i] + " : " + str(final_hotel_list[i]["MinHotelPrice"]
+                                                             ["Currency"]) + str(
+                    final_hotel_list[i]["MinHotelPrice"]["TotalPrice"]) + "\n" + review,
+                       "author": "model",
+                       "itenaryId": str(final_hotel_list[i]["HotelInfo"]["HotelCode"])}
+                customMessages.append(msg)
+                i += 1
+            reqFunction(userId, sessionId, customMessages)
             reviews = []
             start = end
             continue
-    return reviews
 
-def show_hotels_creatively_one_liner_edition(messages, hotels, reqFunction, args):
+
+def show_hotels_creatively_one_liner_edition(messages, hotels):
+    messages.insert(0, {"role": "user", "parts": ["hello"]})
     chatHistory = []
-    reviews = []
-
-    initPrompt =f""" Now, based on the conversation above, this is a hotel which has been shortlisted : {str(hotels)}. Now, I need you to write a short review, in one line under 30 words and present it very creatively, in natural language, not in any format, while carefully assessing the user's needs and what features of the hotel align with them, and what don't.Your review will be personalised for the user, and should address the needs of the user, as much as you can in under 30 words. You can be harsh in pointing out the shortcomings of the hotel where it doesn't meets the user's expectations. You'll ensure that all reviews are under 30 words, and are fun to read. Always end a review with e newline character, and don't use newline anywhere else. So, the output will be of the format '<review 1> \n <review 2> \n' and so on"""
+    initPrompt = f""" Now, based on the conversation above, this is a hotel which has been shortlisted : {str(hotels)}. Now, I need you to write a short review, in one line under 30 words and present it very creatively, in natural language, not in any format, while carefully assessing the user's needs and what features of the hotel align with them, and what don't.Your review will be personalised for the user, and should address the needs of the user, as much as you can in under 30 words. You can be harsh in pointing out the shortcomings of the hotel where it doesn't meets the user's expectations. You'll ensure that all reviews are under 30 words, and are fun to read. Always end a review with e newline character, and don't use newline anywhere else. So, the output will be of the format '<review 1> \n <review 2> \n' and so on"""
     chatHistory.extend(messages)
     chatHistory.append({"role": "user", "parts": [initPrompt]})
     response = model.generate_content(chatHistory,
@@ -160,13 +170,10 @@ def show_hotels_creatively_one_liner_edition(messages, hotels, reqFunction, args
 
                                       )
     chatHistory.remove({"role": "user", "parts": [initPrompt]})
-    # print(response.text)
     reviews = response.text.split("\n")
     for review in reviews:
-        if(review == ""):
+        if (review == ""):
             reviews.remove(review)
-
-
     return reviews
 # def main():
 #     messages = []
