@@ -31,6 +31,12 @@ def get_city_code(country_code, city_name):
     response = requests.post(config.tbo_base_url + "/CityList", auth=creds, json={'CountryCode': country_code})
     if response.status_code == 200:
         for i in response.json()['CityList']:
+            if city_name.lower() == i['Name'].lower():
+                return i["Code"]
+        for i in response.json()['CityList']:
+            if i['Name'].lower().startswith(city_name.lower()):
+                return i["Code"]
+        for i in response.json()['CityList']:
             if city_name.lower() in i['Name'].lower():
                 return i["Code"]
         return 'City Not Found'

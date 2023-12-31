@@ -2,6 +2,12 @@ import re
 import json
 import tbo_handler as tbo
 
+
+def convert_to_messages(strings):
+    messages = []
+    for string in strings:
+        messages.append({"author": "model", "msgContent": string, "itenaryId": ""})
+
 def convert_string_to_json(input):
     match = re.search(r'\{', input)
     input = input[match.start():]
@@ -32,6 +38,10 @@ def make_json_searchable(input_json):
             "NoOfRooms": 0
         }
     }
+    if len(input_json["CountryName"]) >2:
+        input_json["CountryName"] = input_json["CountryName"][0:2]
+    if len(input_json["GuestNationality"]) >2:
+        input_json["GuestNationality"] = "IN"
     for key, value in input_json.items():
         if value == '-1':
             continue

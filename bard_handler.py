@@ -14,8 +14,8 @@ def get_full_user_details(messages):
         "CheckIn": "2023-10-27"(must be an exact date),but will be taken in natural language, for example 27th of october
         "CheckOut": "2023-10-29"(must be an exact date), but will be taken in natural language, for example 29th of october
         "City": "CityName",
-        "CountryName": "CountryName"(eg: IN,UAE),
-        "GuestNationality": "AE",
+        "CountryName": "CountryName"(this field must be 2 letter code of the country,eg: IN,AE),
+        "GuestNationality": "AE"(this field must be 2 letter code of the country,eg: IN,AE),
         "PreferredCurrencyCode": "USD",
         "PaxRooms": [
             {
@@ -131,7 +131,7 @@ def show_hotels_creatively(messages, hotels, reqFunction, final_hotel_list, user
                                           )
         chatHistory.remove({"role": "user", "parts": [initPrompt]})
         reviews.append(response.text)
-        if (len(reviews) == 5 or end == len(hotels) - 1):
+        if (len(reviews) == 5 or end >= len(hotels) - 1):
             customMessages = []
             for review in reviews:
                 print(review.encode("utf-8"))
