@@ -13,7 +13,6 @@ def found_json(curr, userId, sessionId, messages):
     loc = curr["City"]
     depTime = curr["CheckIn"]
     curr = services.make_json_searchable(curr)
-    print(curr)
     hotels = tbo.search_hotels(curr)
     if len(hotels) == 0:
         msg = {"messageContent": "Sorry but we were unable to find any hotels that match your criteria.",
@@ -21,23 +20,22 @@ def found_json(curr, userId, sessionId, messages):
         firebase_db.add_message_to_user_session(userId, sessionId, msg)
         firebase_db.make_user_session_complete(userId, sessionId)
     if hotels is not None:
-        hotels = hotels[0:10]
         if True:
             hotel_names = []
             for hotel in hotels:
                 hotel_names.append(hotel["HotelInfo"]["HotelName"])
-            hotel_names = bard_handler.short_list_hotels(messages[0:-1], hotel_names)
+            if len(hotels) > 1:
+                hotel_names = bard_handler.short_list_hotels(messages[0:-1], hotel_names)
+            hotel_names = hotel_names[0:25]
             final_hotel_list = []
             final_hotel_name_list = []
-
-            print(hotels)
             for hotel in hotels:
                 if hotel["HotelInfo"]["HotelName"] in hotel_names:
                     final_hotel_list.append(hotel)
                     final_hotel_name_list.append(hotel["HotelInfo"]["HotelName"])
             firebase_db.add_data_to_session(userId, sessionId, loc, depTime)
             creative_result = bard_handler.show_hotels_creatively_one_liner_edition(messages[0:-1],
-                                                                                    final_hotel_name_list[:5])
+                                                                                    final_hotel_name_list[0:5])
             firebase_db.make_user_session_complete(userId, sessionId)
             i = 0
             hotels = []
@@ -75,7 +73,6 @@ async def updateForNext(sessionId: str, userId: str):
     messages = firebase_db.get_user_session(userId, sessionId)
     messages = services.convert_firebase_msg_to_bard(messages)
     curr = bard_handler.get_full_user_details(messages)
-    print(curr)
     if "Received hihihiha" in curr:
         thread = threading.Thread(target=found_json, args=(curr, userId, sessionId, messages,))
         thread.start()

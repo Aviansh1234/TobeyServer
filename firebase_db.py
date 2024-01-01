@@ -17,7 +17,7 @@ users_ref = db.collection("users")
 def create_user_session(userId, msg):
     id = current_milli_time()
     (users_ref.document(userId).collection(id)
-     .document("1").set({"messageContent": msg, "location": "", "departTime": "", "author": "model", "itenaryId": ""}))
+     .document("1").set({"hotelsExist": False,"messageContent": msg, "location": "", "departTime": "", "author": "model", "itenaryId": ""}))
     return id
 
 
@@ -46,3 +46,4 @@ def add_data_to_session(userId, sessionId, location, departTime):
 def add_hotels_to_user_session(userId, sessionId, hotels):
     for hotel in hotels:
         users_ref.document(userId).collection(sessionId + " : hotels").document(current_milli_time()).set(hotel)
+    users_ref.document(userId).collection(sessionId).document("1").update({"hotelsExist": True})

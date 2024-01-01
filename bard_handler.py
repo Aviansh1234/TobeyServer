@@ -59,7 +59,7 @@ def get_full_user_details(messages):
     response = model.generate_content(chatHistory,
                                       generation_config=genai.types.GenerationConfig(stop_sequences=['X'],
                                                                                      max_output_tokens=200, top_p=0.9,
-                                                                                     temperature=0.9),
+                                                                                     temperature=0.1),
                                       safety_settings=[
                                           {
                                               "category": "HARM_CATEGORY_HARASSMENT",
@@ -83,7 +83,7 @@ def short_list_hotels(messages, hotels):
     response = model.generate_content(chatHistory,
                                       generation_config=genai.types.GenerationConfig(max_output_tokens=8192,
                                                                                      stop_sequences=['X'], top_p=0.9,
-                                                                                     temperature=0.9),
+                                                                                     temperature=0),
                                       safety_settings=[
                                           {
                                               "category": "HARM_CATEGORY_HARASSMENT",
@@ -97,6 +97,10 @@ def short_list_hotels(messages, hotels):
                                       )
     req = response.text.replace("`", "")
     req = req.replace("python", "")
+    if req == "":
+        return hotels
+    if req[-1] != "]" and req[-1] != "\n":
+        req += "\']"
     reqHotels = eval(req)
     return reqHotels
 
@@ -105,7 +109,6 @@ def show_hotels_creatively(messages, hotels, reqFunction, final_hotel_list, user
     messages.insert(0, {"role": "user", "parts": ["hello"]})
     chatHistory = []
     reviews = []
-    start = 0
     end = 0
     i = 0
     for hotel in hotels:
@@ -134,17 +137,15 @@ def show_hotels_creatively(messages, hotels, reqFunction, final_hotel_list, user
         if (len(reviews) == 5 or end >= len(hotels) - 1):
             customMessages = []
             for review in reviews:
-                print(review.encode("utf-8"))
                 msg = {"messageContent": hotels[i] + " : " + str(final_hotel_list[i]["MinHotelPrice"]
-                                                             ["Currency"]) + str(
-                    final_hotel_list[i]["MinHotelPrice"]["TotalPrice"]) + "\n" + review,
+                                                                 ["Currency"]) + str(
+                           final_hotel_list[i]["MinHotelPrice"]["TotalPrice"]) + "\n" + review,
                        "author": "model",
                        "itenaryId": str(final_hotel_list[i]["HotelInfo"]["HotelCode"])}
                 customMessages.append(msg)
                 i += 1
             reqFunction(userId, sessionId, customMessages)
             reviews = []
-            start = end
             continue
 
 
@@ -171,10 +172,11 @@ def show_hotels_creatively_one_liner_edition(messages, hotels):
                                       )
     chatHistory.remove({"role": "user", "parts": [initPrompt]})
     reviews = response.text.split("\n")
+    final = []
     for review in reviews:
-        if (review == ""):
-            reviews.remove(review)
-    return reviews
+        if (review != ""):
+            final.append(review)
+    return final
 # def main():
 #     messages = []
 #     hotels = ["Alila Diwa, Goa", "Grand Hyatt, Goa", "Caravela Beach Resort, Goa", "The Lalit Golf and Spa Resort, Goa", "Taj Holiday Village Resort and Spa", "Holiday Inn resort, Goa"]

@@ -42,6 +42,10 @@ def make_json_searchable(input_json):
         input_json["CountryName"] = input_json["CountryName"][0:2]
     if len(input_json["GuestNationality"]) >2:
         input_json["GuestNationality"] = "IN"
+    if input_json["CheckIn"][0:4] < "2024":
+        input_json["CheckIn"] = str(int(input_json["CheckIn"][0:4])+1)+"-"+str(input_json["CheckIn"][5:])
+    if input_json["CheckOut"][0:4] < "2024":
+        input_json["CheckOut"] = str(int(input_json["CheckOut"][0:4])+1)+"-"+str(input_json["CheckOut"][5:])
     for key, value in input_json.items():
         if value == '-1':
             continue
