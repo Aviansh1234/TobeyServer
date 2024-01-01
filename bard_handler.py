@@ -56,7 +56,9 @@ def get_full_user_details(messages):
 
     chatHistory.append({"role": "user", "parts": [initPrompt]})
     chatHistory.extend(messages)
-    response = model.generate_content(chatHistory,
+    while True:
+        try:
+            response = model.generate_content(chatHistory,
                                       generation_config=genai.types.GenerationConfig(stop_sequences=['X'],
                                                                                      max_output_tokens=200, top_p=0.9,
                                                                                      temperature=0.1),
@@ -71,6 +73,9 @@ def get_full_user_details(messages):
                                           }
                                       ]
                                       )
+            break
+        except:
+            continue
     return response.text
 
 
@@ -80,21 +85,26 @@ def short_list_hotels(messages, hotels):
     initPrompt = f"""Now, based on the previous conversation, sort the given list of hotels : {str(hotels)} in descending order of relevance to the preferences of the user.You'll strictly assess each aspect of the hotel as per the requirements of the user, based on what you know about the said hotels and give the most accurate sorted list possible, as per my requirements. You'll not ask for any more information, you'll only output a python string list containing the names of the hotels which you think will be preferred by the user,based on the previous conversation, among the list of hotels given to you. """
     chatHistory.extend(messages)
     chatHistory.append({"role": "user", "parts": [initPrompt]})
-    response = model.generate_content(chatHistory,
-                                      generation_config=genai.types.GenerationConfig(max_output_tokens=8192,
-                                                                                     stop_sequences=['X'], top_p=0.9,
-                                                                                     temperature=0),
-                                      safety_settings=[
-                                          {
-                                              "category": "HARM_CATEGORY_HARASSMENT",
-                                              "threshold": "BLOCK_NONE",
-                                          },
-                                          {
-                                              "category": "HARM_CATEGORY_HATE_SPEECH",
-                                              "threshold": "BLOCK_NONE"
-                                          }
-                                      ]
-                                      )
+    while True:
+        try:
+            response = model.generate_content(chatHistory,
+                                          generation_config=genai.types.GenerationConfig(max_output_tokens=8192,
+                                                                                         stop_sequences=['X'], top_p=0.9,
+                                                                                         temperature=0),
+                                          safety_settings=[
+                                              {
+                                                  "category": "HARM_CATEGORY_HARASSMENT",
+                                                  "threshold": "BLOCK_NONE",
+                                              },
+                                              {
+                                                  "category": "HARM_CATEGORY_HATE_SPEECH",
+                                                  "threshold": "BLOCK_NONE"
+                                              }
+                                          ]
+                                          )
+            break
+        except:
+            continue
     req = response.text.replace("`", "")
     req = req.replace("python", "")
     if req == "":
@@ -116,22 +126,27 @@ def show_hotels_creatively(messages, hotels, reqFunction, final_hotel_list, user
         initPrompt = f"""  Now, based on the conversation above, this is a hotel which has been shortlisted : {str(hotel)}. Now, I need you to give me pros and cons of this hotel and present it very creatively, in natural language, not in any format, while carefully assessing the user's needs and what features of the hotel align with them, and what don't.Your review will be personalised for the user, and should address the needs of the user, and will write the review in a tone of talking to the user as a friend, but no greeting or stating that you'll look into it. You'll directly start with the review, without even writing the name of the hotel. You can be harsh in pointing out the shortcomings of the hotel where it doesn't meets the user's expectations. You'll ensure that all reviews are under 100 words, and are fun to read. You'll not greet the user, or write the name of the hotel to start. You'll start with the review straight away."""
         chatHistory.extend(messages)
         chatHistory.append({"role": "user", "parts": [initPrompt]})
-        response = model.generate_content(chatHistory,
-                                          generation_config=genai.types.GenerationConfig(stop_sequences=['X'],
-                                                                                         top_p=0.9,
-                                                                                         temperature=0.9),
-                                          safety_settings=[
-                                              {
-                                                  "category": "HARM_CATEGORY_HARASSMENT",
-                                                  "threshold": "BLOCK_NONE",
-                                              },
-                                              {
-                                                  "category": "HARM_CATEGORY_HATE_SPEECH",
-                                                  "threshold": "BLOCK_NONE"
-                                              }
-                                          ]
+        while True:
+            try:
+                response = model.generate_content(chatHistory,
+                                              generation_config=genai.types.GenerationConfig(stop_sequences=['X'],
+                                                                                             top_p=0.9,
+                                                                                             temperature=0.9),
+                                              safety_settings=[
+                                                  {
+                                                      "category": "HARM_CATEGORY_HARASSMENT",
+                                                      "threshold": "BLOCK_NONE",
+                                                  },
+                                                  {
+                                                      "category": "HARM_CATEGORY_HATE_SPEECH",
+                                                      "threshold": "BLOCK_NONE"
+                                                  }
+                                              ]
 
-                                          )
+                                              )
+                break
+            except:
+                continue
         chatHistory.remove({"role": "user", "parts": [initPrompt]})
         reviews.append(response.text)
         if (len(reviews) == 5 or end >= len(hotels) - 1):
@@ -155,21 +170,26 @@ def show_hotels_creatively_one_liner_edition(messages, hotels):
     initPrompt = f""" Now, based on the conversation above, this is a hotel which has been shortlisted : {str(hotels)}. Now, I need you to write a short review, in one line under 30 words and present it very creatively, in natural language, not in any format, while carefully assessing the user's needs and what features of the hotel align with them, and what don't.Your review will be personalised for the user, and should address the needs of the user, as much as you can in under 30 words. You can be harsh in pointing out the shortcomings of the hotel where it doesn't meets the user's expectations. You'll ensure that all reviews are under 30 words, and are fun to read. Always end a review with e newline character, and don't use newline anywhere else. So, the output will be of the format '<review 1> \n <review 2> \n' and so on. You will not greet the user, or write the name of the hotel to start. You'll directly start with the review"""
     chatHistory.extend(messages)
     chatHistory.append({"role": "user", "parts": [initPrompt]})
-    response = model.generate_content(chatHistory,
-                                      generation_config=genai.types.GenerationConfig(stop_sequences=['X'], top_p=0.9,
-                                                                                     temperature=0.9),
-                                      safety_settings=[
-                                          {
-                                              "category": "HARM_CATEGORY_HARASSMENT",
-                                              "threshold": "BLOCK_NONE",
-                                          },
-                                          {
-                                              "category": "HARM_CATEGORY_HATE_SPEECH",
-                                              "threshold": "BLOCK_NONE"
-                                          }
-                                      ]
+    while True:
+        try:
+            response = model.generate_content(chatHistory,
+                                          generation_config=genai.types.GenerationConfig(stop_sequences=['X'], top_p=0.9,
+                                                                                         temperature=0.9),
+                                          safety_settings=[
+                                              {
+                                                  "category": "HARM_CATEGORY_HARASSMENT",
+                                                  "threshold": "BLOCK_NONE",
+                                              },
+                                              {
+                                                  "category": "HARM_CATEGORY_HATE_SPEECH",
+                                                  "threshold": "BLOCK_NONE"
+                                              }
+                                          ]
 
-                                      )
+                                          )
+            break
+        except:
+            continue
     chatHistory.remove({"role": "user", "parts": [initPrompt]})
     reviews = response.text.split("\n")
     final = []
