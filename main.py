@@ -44,7 +44,7 @@ def found_json(curr, userId, sessionId, messages):
                                                                                 ["Currency"]) + str(
                     final_hotel_list[i]["MinHotelPrice"]["TotalPrice"]) + "\n" + creative,
                        "author": "model",
-                       "itenaryId": str(final_hotel_list[i]["HotelInfo"]["HotelCode"])}
+                       "itenaryId": ""}
                 hotels.append(msg)
                 i += 1
             i = 0
